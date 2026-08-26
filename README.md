@@ -28,6 +28,9 @@ options:
 - Desktop app:
     - Hot reload: `./gradlew :app:desktopApp:hotRun --auto`
     - Standard run: `./gradlew :app:desktopApp:run`
+    - Runnable JAR (Java already installed): `./gradlew :app:desktopApp:packageDesktopJar`
+      - Output: `app/desktopApp/build/libs/com.rhuertas.cncjsdashboard-desktop-1.0.0-all.jar`
+      - Includes desktop natives for Windows x64, macOS x64/arm64, and Linux x64/arm64
 - Server: `./gradlew :server:run`
 - Web app:
     - Wasm target (faster, modern browsers): `./gradlew :app:webApp:wasmJsBrowserDevelopmentRun`
