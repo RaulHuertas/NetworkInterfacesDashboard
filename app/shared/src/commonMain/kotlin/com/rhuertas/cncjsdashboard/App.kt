@@ -88,6 +88,8 @@ private fun NetworkInterfaceCard(iface: NetworkInterfaceInfo) {
                 fontWeight = FontWeight.SemiBold,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            InterfaceRow(label = "Adapter", value = iface.name)
+            Spacer(modifier = Modifier.height(4.dp))
             InterfaceRow(label = "IP", value = iface.ip)
             Spacer(modifier = Modifier.height(4.dp))
             InterfaceRow(label = "Netmask", value = iface.netmask)
