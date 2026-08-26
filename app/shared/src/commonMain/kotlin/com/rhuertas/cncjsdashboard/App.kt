@@ -13,6 +13,11 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -29,7 +34,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun App() {
     MaterialTheme {
-        val interfaces = remember { getNetworkInterfaces() }
+        var interfaces by remember { mutableStateOf(emptyList<NetworkInterfaceInfo>()) }
+        LaunchedEffect(Unit) {
+            while (true) {
+                interfaces = getNetworkInterfaces()
+                delay(30_000)
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
