@@ -10,7 +10,7 @@ fun main(args: Array<String>) = application {
     val windowState = if (isWindowed) {
         rememberWindowState()
     } else {
-        rememberWindowState(placement = WindowPlacement.Fullscreen)
+        rememberWindowState(placement = WindowPlacement.Maximized)
     }
 
     Window(
