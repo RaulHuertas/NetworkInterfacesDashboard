@@ -35,39 +35,83 @@ import androidx.compose.ui.unit.dp
 fun App() {
     MaterialTheme {
         var interfaces by remember { mutableStateOf(emptyList<NetworkInterfaceInfo>()) }
+        var metricsHistory by remember { mutableStateOf(emptyList<SystemMetrics>()) }
+        var currentMetrics by remember { mutableStateOf<SystemMetrics?>(null) }
+
         LaunchedEffect(Unit) {
             while (true) {
                 interfaces = getNetworkInterfaces()
-                delay(30_000)
+                val metrics = getSystemMetrics()
+                currentMetrics = metrics
+                
+                // Keep rolling window of last 30 data points
+                metricsHistory = (metricsHistory + metrics).takeLast(30)
+                
+                delay(10_000) // Update every 10 seconds
             }
         }
-        Column(
+
+        Row(
             modifier = Modifier
                 .fillMaxSize()
                 .safeContentPadding()
                 .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Network Interfaces",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            if (interfaces.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "No network interfaces available on this platform.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+            // Left side: Network Interfaces
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize()
+            ) {
+                Text(
+                    text = "Network Interfaces",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                if (interfaces.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "No network interfaces available on this platform.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                } else {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items(interfaces) { iface ->
+                            NetworkInterfaceCard(iface)
+                        }
+                    }
                 }
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(interfaces) { iface ->
-                        NetworkInterfaceCard(iface)
+            }
+
+            // Right side: System Metrics (CPU and RAM)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize()
+            ) {
+                Text(
+                    text = "System Metrics",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    item {
+                        CpuLineChart(metricsHistory)
+                    }
+                    item {
+                        RamGauge(currentMetrics)
                     }
                 }
             }
